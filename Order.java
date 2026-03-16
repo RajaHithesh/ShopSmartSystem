@@ -3,17 +3,15 @@
 public class Order {
 
     int orderId;
+    String orderName;
     String products;
+    double amount;
 
-    public Order(int id,String products){
+    public Order(int orderId, String orderName, String products, double amount) {
 
-        this.orderId = id;
+        this.orderId = orderId;
+        this.orderName = orderName;
         this.products = products;
-    }
-
-    public void display(){
-
-        System.out.println("Order ID : " + orderId);
-        System.out.println("Products : " + products);
+        this.amount = amount;
     }
 }
