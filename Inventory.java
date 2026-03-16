@@ -1,50 +1,52 @@
 
 
-import java.io.FileWriter;
+import java.io.*;
 
 public class Inventory {
 
-    Product[] products;
-    int size = 0;
+    Product products[];
+    int count;
 
-    public Inventory(int capacity) {
-        products = new Product[capacity];
+    public Inventory(int size) {
+
+        products = new Product[size];
+        count = 0;
     }
 
     public void addProduct(Product p) {
-        products[size++] = p;
 
-        // Save default products also to stock file
+        products[count++] = p;
         saveStock(p);
     }
 
-    public void viewProducts(){
+    public void addProductManually(String name, double price, int stock) {
 
-        if(size == 0){
-            System.out.println("No products available");
-            return;
+        for(int i=0;i<count;i++) {
+
+            if(products[i].name.equalsIgnoreCase(name)) {
+
+                products[i].stock += stock;
+
+                saveAllStocks();
+
+                System.out.println("Stock updated for existing product");
+
+                return;
+            }
         }
 
-        System.out.println("\n+------+--------------+----------+-------+");
-        System.out.printf("| %-4s | %-12s | %-8s | %-5s |\n",
-                "ID","Name","Price","Stock");
-        System.out.println("+------+--------------+----------+-------+");
+        Product p = new Product(name,price,stock);
 
-        for(int i=0;i<size;i++){
+        products[count++] = p;
 
-            System.out.printf("| %-4d | %-12s | %-8.2f | %-5d |\n",
-                    products[i].id,
-                    products[i].name,
-                    products[i].price,
-                    products[i].stock);
-        }
+        saveStock(p);
 
-        System.out.println("+------+--------------+----------+-------+");
+        System.out.println("New product added");
     }
 
-    public Product searchByName(String name){
+    public Product searchByName(String name) {
 
-        for(int i=0;i<size;i++){
+        for(int i=0;i<count;i++) {
 
             if(products[i].name.equalsIgnoreCase(name))
                 return products[i];
@@ -53,9 +55,9 @@ public class Inventory {
         return null;
     }
 
-    public Product searchById(int id){
+    public Product searchById(int id) {
 
-        for(int i=0;i<size;i++){
+        for(int i=0;i<count;i++) {
 
             if(products[i].id == id)
                 return products[i];
@@ -64,39 +66,22 @@ public class Inventory {
         return null;
     }
 
-    public void addProductManually(String name,double price,int stock){
+    public void viewProducts() {
 
-        Product existing = searchByName(name);
+        System.out.println("\nID   Name       Price   Stock");
 
-        if(existing != null){
+        for(int i=0;i<count;i++) {
 
-            if(existing.stock > 0){
-                System.out.println("Product already exists");
-                return;
-            }
-            else{
-                existing.stock = stock;
-                existing.price = price;
-
-                saveStock(existing);
-
-                System.out.println("Stock updated");
-                return;
-            }
+            System.out.println(products[i].id + "   "
+                    + products[i].name + "   "
+                    + products[i].price + "   "
+                    + products[i].stock);
         }
-
-        Product p = new Product(name,price,stock);
-
-        products[size++] = p;
-
-        saveStock(p);
-
-        System.out.println("Product Added Successfully");
     }
 
-    public void saveStock(Product p){
+    public void saveStock(Product p) {
 
-        try{
+        try {
 
             FileWriter fw = new FileWriter("stock.csv",true);
 
@@ -104,25 +89,31 @@ public class Inventory {
 
             fw.close();
 
-        }catch(Exception e){
+        } catch(Exception e) {
 
             System.out.println("File error");
         }
     }
 
-    public void removeProduct(int id){
+    public void saveAllStocks() {
 
-        for(int i = 0; i < size; i++){
+        try {
 
-            if(products[i].id == id){
+            FileWriter fw = new FileWriter("stock.csv");
 
-                for(int j = i; j < size-1; j++){
-                    products[j] = products[j+1];
-                }
+            for(int i=0;i<count;i++) {
 
-                size--;
-                return;
+                fw.append(products[i].id + ","
+                        + products[i].name + ","
+                        + products[i].price + ","
+                        + products[i].stock + "\n");
             }
+
+            fw.close();
+
+        } catch(Exception e) {
+
+            System.out.println("File error");
         }
     }
 }
