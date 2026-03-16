@@ -9,10 +9,19 @@ public class Product {
     double price;
     int stock;
 
-    public Product(String name, double price, int stock) {
+    public Product(String name,double price,int stock) {
 
         Random r = new Random();
-        this.id = 100 + r.nextInt(900);   // random ID
+        this.id = 100 + r.nextInt(900);
+
+        this.name = name;
+        this.price = price;
+        this.stock = stock;
+    }
+
+    public Product(int id,String name,double price,int stock) {
+
+        this.id = id;
         this.name = name;
         this.price = price;
         this.stock = stock;

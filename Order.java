@@ -3,11 +3,17 @@
 public class Order {
 
     int orderId;
-    String message;
+    String products;
 
-    public Order(int orderId, String message) {
+    public Order(int id,String products){
 
-        this.orderId = orderId;
-        this.message = message;
+        this.orderId = id;
+        this.products = products;
+    }
+
+    public void display(){
+
+        System.out.println("Order ID : " + orderId);
+        System.out.println("Products : " + products);
     }
 }

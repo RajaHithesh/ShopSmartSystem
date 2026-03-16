@@ -1,3 +1,5 @@
+
+
 import java.util.*;
 
 public class ShopSmartSystem {
@@ -8,17 +10,15 @@ public class ShopSmartSystem {
 
         Inventory inventory = new Inventory(20);
         Cart cart = new Cart();
-        Queue<Order> orderQueue = new LinkedList<>();
 
-
-        inventory.addProduct(new Product("Mobile", 20000, 10));
-        inventory.addProduct(new Product("Laptop", 50000, 5));
-        inventory.addProduct(new Product("Headphone", 2000, 15));
-        inventory.addProduct(new Product("Mouse", 700, 25));
+        inventory.addProduct(new Product("Mobile",20000,10));
+        inventory.addProduct(new Product("Laptop",50000,5));
+        inventory.addProduct(new Product("Headphone",2000,15));
+        inventory.addProduct(new Product("Mouse",700,25));
 
         int choice;
 
-        do {
+        do{
 
             System.out.println("\n1 View Products");
             System.out.println("2 Search Product by Name");
@@ -26,7 +26,7 @@ public class ShopSmartSystem {
             System.out.println("4 Add to Cart");
             System.out.println("5 View Cart");
             System.out.println("6 Remove from Cart");
-            System.out.println("7 Place Order (Generate Bill)");
+            System.out.println("7 Place Order");
             System.out.println("8 Add New Product");
             System.out.println("9 Exit");
 
@@ -35,7 +35,7 @@ public class ShopSmartSystem {
             choice = sc.nextInt();
             sc.nextLine();
 
-            switch(choice) {
+            switch(choice){
 
                 case 1:
 
@@ -49,9 +49,8 @@ public class ShopSmartSystem {
 
                     Product p = inventory.searchByName(name);
 
-                    if(p != null) {
+                    if(p != null){
 
-                        System.out.println("Product Found");
                         System.out.println("ID : " + p.id);
                         System.out.println("Name : " + p.name);
                         System.out.println("Price : " + p.price);
@@ -70,9 +69,8 @@ public class ShopSmartSystem {
 
                     Product pid = inventory.searchById(id);
 
-                    if(pid != null) {
+                    if(pid != null){
 
-                        System.out.println("Product Found");
                         System.out.println("ID : " + pid.id);
                         System.out.println("Name : " + pid.name);
                         System.out.println("Price : " + pid.price);
@@ -90,8 +88,17 @@ public class ShopSmartSystem {
 
                     Product product = inventory.searchByName(add);
 
-                    if(product != null)
-                        cart.addToCart(product,1);
+                    if(product != null){
+
+                        System.out.print("Enter quantity: ");
+                        int qty = sc.nextInt();
+                        sc.nextLine();
+
+                        if(qty <= product.stock)
+                            cart.addToCart(product,qty);
+                        else
+                            System.out.println("Not enough stock");
+                    }
                     else
                         System.out.println("Product not found");
 
@@ -108,12 +115,11 @@ public class ShopSmartSystem {
                     String remove = sc.nextLine();
 
                     cart.removeFromCart(remove);
-
                     break;
 
                 case 7:
 
-                    if(cart.head == null) {
+                    if(cart.head == null){
 
                         System.out.println("Cart Empty");
                         break;
@@ -125,10 +131,11 @@ public class ShopSmartSystem {
                     System.out.println("\n========= ORDER BILL =========");
 
                     System.out.println("+------+--------------+-------+----------+");
-                    System.out.printf("| %-4s | %-12s | %-5s | %-8s |\n","ID","Product","Qty","Price");
+                    System.out.printf("| %-4s | %-12s | %-5s | %-8s |\n",
+                            "ID","Product","Qty","Price");
                     System.out.println("+------+--------------+-------+----------+");
 
-                    while(temp != null) {
+                    while(temp != null){
 
                         double price = temp.product.price * temp.quantity;
 
@@ -140,16 +147,22 @@ public class ShopSmartSystem {
 
                         total += price;
 
+                        // ⭐ Reduce stock
+                        temp.product.stock -= temp.quantity;
+
+                        inventory.saveStock(temp.product);
+
+                        // ⭐ Remove if stock becomes 0
+                        if(temp.product.stock <= 0){
+                            inventory.removeProduct(temp.product.id);
+                        }
+
                         temp = temp.next;
                     }
 
                     System.out.println("+------+--------------+-------+----------+");
 
                     System.out.println("TOTAL BILL : " + total);
-
-                    Order order = new Order(orderQueue.size()+1,"Order Generated");
-
-                    orderQueue.add(order);
 
                     cart.clearCart();
 
@@ -167,7 +180,7 @@ public class ShopSmartSystem {
                     int stock = sc.nextInt();
                     sc.nextLine();
 
-                    inventory.addProductManually(pname, price, stock);
+                    inventory.addProductManually(pname,price,stock);
 
                     break;
 
@@ -177,11 +190,10 @@ public class ShopSmartSystem {
                     break;
 
                 default:
-
                     System.out.println("Invalid choice");
             }
 
-        } while(choice != 9);
+        }while(choice != 9);
 
         sc.close();
     }
